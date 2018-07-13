@@ -27,10 +27,12 @@ module Mongoid
         handler = self
         klass.send(:define_method, :"#{method.to_s}_with_#{handler.field_name}_safety") do |method_options = {}|
           self.resolve_token_collisions handler do
-            with(:safe => true).send(:"#{method.to_s}_without_#{handler.field_name}_safety", method_options)
+            send(:"#{method.to_s}_without_#{handler.field_name}_safety", method_options)
           end
         end
-        klass.alias_method_chain method.to_sym, :"#{handler.field_name}_safety"
+#        klass.alias_method_chain method.to_sym, :"#{handler.field_name}_safety"
+        klass.send :alias_method, :"#{method.to_s}_without_#{handler.field_name}_safety", method.to_sym
+        klass.send :alias_method, method.to_sym, :"#{method.to_s}_with_#{handler.field_name}_safety"
       end
     end
   end
